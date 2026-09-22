@@ -22,9 +22,9 @@ for (const row of rows) {
 
 console.log("## Benchmark comparison\n");
 console.log(`Raw JSON: \`${path}\`\n`);
-console.log("Lower is better for every metric. 🟢 marks the better result, 🔴 the worse result, and ⚪ means the comparison is unavailable. Percentages show master versus M5.\n");
-console.log("| Scenario | Mount | Update all | Reverse | Unmount | Heap mounted | Heap after unmount |");
-console.log("|---|---:|---:|---:|---:|---:|---:|");
+console.log("Master and M5 are shown side by side. Lower is better for every metric. Percentages show Master versus M5.\n");
+console.log("| Scenario | Metric | Master | M5 | Verdict |");
+console.log("|---|---|---:|---:|---|");
 
 const scenarios = [...new Set(rows.map(row => row.scenario))];
 const measure = (variant: string, scenario: string, metric: string): number | undefined => {
@@ -36,16 +36,35 @@ const measure = (variant: string, scenario: string, metric: string): number | un
   }
   return median(values.map(row => row.timing[metric]));
 };
-const cell = (scenario: string, metric: string, divisor: number): string => {
+const comparison = (scenario: string, metric: string, divisor: number): { master: string; m5: string; verdict: string } => {
   const master = measure("master", scenario, metric);
   const baseline = measure("m5", scenario, metric);
   const unit = metric.startsWith("heap") ? "KiB" : "ms";
-  if (master === undefined) return "⚪ unavailable";
-  if (baseline === undefined) return `⚪ ${(master / divisor).toFixed(1)} ${unit} (master only)`;
+  if (master === undefined && baseline === undefined) return { master: "—", m5: "—", verdict: "⚪ unavailable" };
+  if (master === undefined) return { master: "—", m5: `${(baseline! / divisor).toFixed(1)} ${unit}`, verdict: "⚪ M5 only" };
+  if (baseline === undefined) return { master: `${(master / divisor).toFixed(1)} ${unit}`, m5: "—", verdict: "⚪ Master only" };
   const change = ((master / baseline) - 1) * 100;
-  const icon = Math.abs(master - baseline) < 0.0001 ? "⚪" : master < baseline ? "🟢" : "🔴";
-  return `${icon} ${(master / divisor).toFixed(1)} ${unit} (${change >= 0 ? "+" : ""}${change.toFixed(1)}%)`;
+  const verdict = Math.abs(master - baseline) < 0.0001
+    ? "⚪ Same"
+    : master < baseline
+      ? `🟢 Master better (${change.toFixed(1)}%)`
+      : `🔴 Master worse (+${change.toFixed(1)}%)`;
+  return {
+    master: `${(master / divisor).toFixed(1)} ${unit}`,
+    m5: `${(baseline / divisor).toFixed(1)} ${unit}`,
+    verdict
+  };
 };
 for (const scenario of scenarios) {
-  console.log(`| ${scenario} | ${cell(scenario, "mount", 1)} | ${cell(scenario, "update-all", 1)} | ${cell(scenario, "reverse", 1)} | ${cell(scenario, "unmount", 1)} | ${cell(scenario, "heap-mounted", 1024)} | ${cell(scenario, "heap-disposed", 1024)} |`);
+  for (const [label, metric, divisor] of [
+    ["Mount", "mount", 1],
+    ["Update all", "update-all", 1],
+    ["Reverse", "reverse", 1],
+    ["Unmount", "unmount", 1],
+    ["Heap mounted", "heap-mounted", 1024],
+    ["Heap after unmount", "heap-disposed", 1024]
+  ] as const) {
+    const result = comparison(scenario, metric, divisor);
+    console.log(`| ${scenario} | ${label} | ${result.master} | ${result.m5} | ${result.verdict} |`);
+  }
 }
