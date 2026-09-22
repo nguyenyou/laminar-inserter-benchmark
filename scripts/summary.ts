@@ -39,12 +39,13 @@ const measure = (variant: string, scenario: string, metric: string): number | un
 const cell = (scenario: string, metric: string, divisor: number): string => {
   const master = measure("master", scenario, metric);
   const baseline = measure("m5", scenario, metric);
-  if (master === undefined) return "⚪ master only";
-  if (baseline === undefined) return `⚪ ${(master / divisor).toFixed(1)}`;
+  const unit = metric.startsWith("heap") ? "KiB" : "ms";
+  if (master === undefined) return "⚪ unavailable";
+  if (baseline === undefined) return `⚪ ${(master / divisor).toFixed(1)} ${unit} (master only)`;
   const change = ((master / baseline) - 1) * 100;
   const icon = Math.abs(master - baseline) < 0.0001 ? "⚪" : master < baseline ? "🟢" : "🔴";
-  return `${icon} ${ (master / divisor).toFixed(1)} ms (${change >= 0 ? "+" : ""}${change.toFixed(1)}%)`;
+  return `${icon} ${(master / divisor).toFixed(1)} ${unit} (${change >= 0 ? "+" : ""}${change.toFixed(1)}%)`;
 };
 for (const scenario of scenarios) {
-  console.log(`| ${scenario} | ${cell(scenario, "mount", 1)} | ${cell(scenario, "update-all", 1)} | ${cell(scenario, "reverse", 1)} | ${cell(scenario, "unmount", 1)} | ${cell(scenario, "heap-mounted", 1024).replace(" ms", " KiB")} | ${cell(scenario, "heap-disposed", 1024).replace(" ms", " KiB")} |`);
+  console.log(`| ${scenario} | ${cell(scenario, "mount", 1)} | ${cell(scenario, "update-all", 1)} | ${cell(scenario, "reverse", 1)} | ${cell(scenario, "unmount", 1)} | ${cell(scenario, "heap-mounted", 1024)} | ${cell(scenario, "heap-disposed", 1024)} |`);
 }
