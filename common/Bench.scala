@@ -3,7 +3,6 @@ package perf
 import com.raquo.laminar.api.L._
 import org.scalajs.dom
 import scala.scalajs.js
-import scala.scalajs.js.annotation.JSExportTopLevel
 
 /** Browser-only synchronous workload. The runner collects garbage outside timed operations. */
 object Bench {
@@ -17,7 +16,6 @@ object Bench {
     dom.window.performance.now() - start
   }
 
-  @JSExportTopLevel("installBench")
   def install(): Unit = {
     val api = js.Dynamic.literal()
     api.mount = { (scenario: String, n: Int) =>
@@ -52,7 +50,7 @@ object Bench {
       container.foreach(_.remove())
       container = None
     }: js.Function0[Unit]
-    js.Dynamic.global.updateDynamic("bench")(api)
+    js.Dynamic.global.window.updateDynamic("bench")(api)
   }
 
   def main(args: Array[String]): Unit = install()

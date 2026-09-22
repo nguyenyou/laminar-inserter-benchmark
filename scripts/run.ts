@@ -25,7 +25,6 @@ try {
       page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
       const cdp = await page.context().newCDPSession(page);
       await page.addScriptTag({ path: `out/${variant}.js` });
-      await page.evaluate(() => (globalThis as any).installBench());
       async function heap() {
         await cdp.send('HeapProfiler.collectGarbage');
         return (await cdp.send('Runtime.getHeapUsage')).usedSize;
