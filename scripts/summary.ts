@@ -22,7 +22,7 @@ for (const row of rows) {
 
 console.log("## Benchmark comparison\n");
 console.log(`Raw JSON: \`${path}\`\n`);
-console.log("Master and M5 are shown side by side. Lower is better for every metric. Percentages show Master versus M5.\n");
+console.log("Master (with experimental bulk owner-teardown optimization) and M5 are shown side by side. Lower is better for every metric. Percentages show Master versus M5.\n");
 console.log("| Scenario | Metric | Master | M5 | Verdict |");
 console.log("|---|---|---:|---:|---|");
 
