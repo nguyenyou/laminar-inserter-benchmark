@@ -28,6 +28,8 @@ Use a small smoke run first:
 bun run bench 50 2
 ```
 
+GitHub Actions runs the same benchmark through the manually dispatched **Inserter benchmark** workflow. Its run summary contains median timing and heap tables, and the raw JSON is downloadable from the run's artifact.
+
 The benchmark intentionally reports raw measurements instead of declaring a winner. Compare medians across repeated runs on the same machine; browser timing is sensitive to CPU load and power state. The baseline uses the published `18.0.0-M5` artifacts, while the current variant compiles the pinned source revision.
 
 Scenarios beginning with `elem-` use dynamic inserters inside list items. `item-` scenarios exercise dynamic inserters as list items, including nested `child <--` and `children <--` groups.

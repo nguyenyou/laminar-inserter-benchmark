@@ -1,0 +1,45 @@
+name: Inserter benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      items:
+        description: Widgets per scenario
+        required: false
+        default: "2000"
+      rounds:
+        description: Measured rounds after warmup
+        required: false
+        default: "5"
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BENCH_ITEMS: ${{ inputs.items || '2000' }}
+      BENCH_ROUNDS: ${{ inputs.rounds || '5' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.2"
+      - uses: VirtusLab/scala-cli-setup@main
+        with:
+          power: true
+      - run: bun install --frozen-lockfile
+      - run: bun run setup
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run build
+      - run: bun run bench "$BENCH_ITEMS" "$BENCH_ROUNDS"
+      - name: Publish benchmark summary
+        run: bun scripts/summary.ts results/*/raw.json >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload raw benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: laminar-inserter-benchmark-${{ github.run_id }}
+          path: results/
+          if-no-files-found: error
