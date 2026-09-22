@@ -1,0 +1,11 @@
+{
+  "name": "laminar-inserter-bench",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "bun scripts/setup.ts && bun install && bunx playwright install chromium",
+    "build": "bun scripts/build.ts",
+    "bench": "bun scripts/run.ts"
+  },
+  "devDependencies": { "playwright": "1.55.1" }
+}

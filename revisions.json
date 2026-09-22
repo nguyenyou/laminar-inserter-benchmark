@@ -1,0 +1,5 @@
+{
+  "master": { "repo": "https://github.com/raquo/Laminar.git", "commit": "90a5730042f652086fe19ada8a35a5dfa9224a1d" },
+  "m5": { "repo": "https://github.com/raquo/Laminar.git", "commit": "098433793be4e745fe9ac9a58a01fce545dc0bc2" },
+  "airstream": { "repo": "https://github.com/raquo/Airstream.git", "commit": "3ac1fad2fb211094c5fc7c1e306d0ecceaa2af6b" }
+}

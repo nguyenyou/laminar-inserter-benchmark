@@ -1,0 +1,8 @@
+node_modules/
+.deps/
+.scala-build/
+.bsp/
+**/.scala-build/
+**/.bsp/
+out/
+results/
