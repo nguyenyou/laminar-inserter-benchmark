@@ -9,7 +9,7 @@ for (const [name, pin] of Object.entries(revisions)) {
 }
 await mkdir('out', { recursive: true });
 for (const variant of ['m5', 'master']) {
-  const child = Bun.spawn(['scala-cli', '--power', 'package', variant, '--server=false', '--js', '--js-module-kind', 'none', '--js-mode', 'release', '-o', `out/${variant}.js`, '-f'], { stdout: 'inherit', stderr: 'inherit' });
+  const child = Bun.spawn(['scala-cli', '--power', 'package', variant, '--server=false', '--js', '--js-module-kind', 'none', '--js-mode', 'release', '--main-class', 'perf.Bench', '-o', `out/${variant}.js`, '-f'], { stdout: 'inherit', stderr: 'inherit' });
   if (await child.exited !== 0) throw new Error(`Build failed: ${variant}`);
 }
 await Bun.write('out/revisions.json', JSON.stringify(revisions));
